@@ -19,7 +19,7 @@ use strict;
 use base qw(Pure::Text::NASA_Ames);
 use Text::NASA_Ames::DataEntry;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub _carp {
     my $self = shift;
@@ -268,8 +268,8 @@ sub _parseTopHeader {
     $self->iVol($vol[0]);
     $self->nVol($vol[1]);
     my @date = split ' ', $self->nextLine;
-    $self->date($date[0]);
-    $self->rDate($date[1]);
+    $self->date("$date[0] $date[1] $date[2]");
+    $self->rDate("$date[3] $date[4] $date[5]");
     unless ($self->currentLine != 7) {
 	$self->_carp("problems reading top header, expected 7 lines, got ".
 	    $self->currentLine);
@@ -301,7 +301,10 @@ sub _parseList {
     my ($self, $type, $expected) = @_;
     if ($expected != 0) {
 	my @list = split ' ', $self->nextLine;
-	if (@list != $expected) {
+        while (@list < $expected) {
+	    push @list, split ' ', $self->nextLine;
+	}
+	if (@list > $expected) {
 	    $self->_carp("got ".scalar @list . 
 			 " $type values, expected $expected\n");
 	    return;

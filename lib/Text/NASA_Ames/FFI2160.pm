@@ -9,7 +9,7 @@ use Carp;
 use 5.00600;
 use strict;
 
-our $VERSION = do { my @r = (q$Revision: 1.1 $ =~ /\d+/g); sprintf " %d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/g); sprintf " %d." . "%02d" x $#r, @r };
 
 
 =head1 NAME
@@ -94,8 +94,11 @@ sub _refillBuffer {
     return unless defined $line;
 
     my ($nX1, @a) = split ' ', $line;
-    if (@a != ($self->nAuxV - $self->nAuxC)) {
-	$self->_carp("not enough elements for numeric Aux, expected ".
+    while (@a < ($self->nAuxV - $self->nAuxC)) {
+	push @a, split ' ', $self->nextLine;
+    }
+    if (@a > ($self->nAuxV - $self->nAuxC)) {
+	$self->_carp("to much elements for numeric Aux, expected ".
 		     ($self->nAuxV() - $self->nAuxC). ", got ". scalar @a);
 	return;
     }
@@ -147,7 +150,7 @@ scaling for X1
 
 =head1 VERSION
 
-$Id: FFI2160.pm,v 1.1 2004/02/18 09:25:04 heikok Exp $
+$Id: FFI2160.pm,v 1.2 2004/03/16 16:33:07 heikok Exp $
 
 
 =head1 AUTHOR
